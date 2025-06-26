@@ -8,6 +8,9 @@ from youtube_transcript_api import (
     YouTubeTranscriptApi, NoTranscriptFound, TranscriptsDisabled
 )
 
+import os, openai, json, textwrap, datetime
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 def _extract_video_id(url: str) -> str | None:
     """
     Robustly pulls the 11-char video ID from any normal YouTube link.
@@ -53,3 +56,44 @@ def fetch_transcript(url: str, langs=None):
         return [{"time": "", "text": "No transcript in requested languages."}]
     except TranscriptsDisabled:
         return [{"time": "", "text": "Transcripts are disabled for this video."}]
+    
+def _format_for_prompt(segments, limit=3000):
+    """
+    Turns [{time:'0:00:01',text:'hi'}...] into a compact string.
+    Cuts off after ~limit characters to stay inside context.
+    """
+    lines = [f"{s['time']} {s['text']}" for s in segments]
+    joined = "\n".join(lines)
+    return joined[:limit]    
+
+def suggest_reels(segments, model="o3"):
+    """
+    Ask the LLM for 5 reels (60-90 s) and return python objects:
+    [{title,start,end}, …]
+    """
+    prompt = textwrap.dedent(f"""
+        Below is a YouTube transcript (time + text per line).
+        Pick FIVE highlight clips suitable for Instagram Reels (60-90 seconds each).
+        Make Sure the language which you return is HINGLISH and keep the letters in ENGLISH only                     
+        Return JSON list, each object = {{
+          "title":  short catchy title,
+          "start":  start timestamp HH:MM:SS,
+          "end":    end timestamp HH:MM:SS
+        }}.
+        JSON only, no markdown.
+
+        Transcript:
+        { _format_for_prompt(segments) }
+    """)
+
+    rsp = openai.chat.completions.create(
+        model=model,
+        messages=[{"role":"user","content":prompt}],
+        #temperature=0.3
+    )
+    raw = rsp.choices[0].message.content.strip()
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        # fallback: empty list avoids template crash
+        return []

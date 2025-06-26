@@ -19,26 +19,48 @@
   </div>
 
   {% if transcript %}
-  <div class="card card-dark p-3 mx-auto mt-4 transcript-box" id="tbox"
-       data-vid="{{ video_id }}">
-    {% for seg in transcript %}
-      <div class="d-flex align-items-start mb-2">
-        <span class="time-pill">{{ seg.time }}</span>
-        <span class="ms-3 flex-grow-1">{{ seg.text }}</span>
-      </div>
-    {% endfor %}
+<div class="row g-4 mt-4">
+  <!-- LEFT: transcript -->
+  <div class="col-md-8">
+    <div class="card card-dark p-3 transcript-box" id="tbox" data-vid="{{ video_id }}">
+      {% for seg in transcript %}
+        <div class="d-flex align-items-start mb-2">
+          <span class="time-pill">{{ seg.time }}</span>
+          <span class="ms-3 flex-grow-1">{{ seg.text }}</span>
+        </div>
+      {% endfor %}
+    </div>
   </div>
 
-  <script>
-    const vid = document.getElementById('tbox').dataset.vid;
-    document.querySelectorAll('.time-pill').forEach(el=>{
-      el.addEventListener('click', ()=>{
-        const sec = el.innerText.split(':').reduce((t,v)=>60*t + +v, 0);
-        if (vid) {
-          window.open(`https://www.youtube.com/watch?v=${vid}&t=${sec}s`, '_blank');
-        }
-      });
+  <!-- RIGHT: reel suggestions -->
+  <div class="col-md-4">
+    <div class="card card-dark p-3">
+      <h5 class="mb-3">Reel ideas (60-90 s)</h5>
+      {% for r in reels %}
+        <div class="mb-3">
+          <strong>{{ r.title }}</strong><br>
+          <a href="https://www.youtube.com/watch?v={{ video_id }}&t={{ r.start }}s"
+             target="_blank" class="small link-info">
+             {{ r.start }} → {{ r.end }}
+          </a>
+        </div>
+      {% empty %}
+        <span class="text-secondary small">No suggestions yet.</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  /* existing timestamp click-to-jump */
+  const vid = document.getElementById('tbox').dataset.vid;
+  document.querySelectorAll('.time-pill').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const sec = el.innerText.split(':').reduce((t,v)=>60*t+ +v,0);
+      if (vid) window.open(`https://www.youtube.com/watch?v=${vid}&t=${sec}s`,'_blank');
     });
-  </script>
+  });
+</script>
 {% endif %}
+
 {% endblock %}

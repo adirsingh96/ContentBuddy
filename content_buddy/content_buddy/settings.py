@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+import os, dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv.load_dotenv(BASE_DIR / ".env")        # NEW
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") # optional: can be read elsewhere too
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
