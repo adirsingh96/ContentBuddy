@@ -57,11 +57,47 @@
 .card-dark { background:#0f1117; border:none; }
 .card-dark h5 { color:#fff; }
 
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1050;          /* above everything */
+}
+.d-none{display:none;}
+
   </style>
 </head>
+
 <body>
-<div class="container py-5">
-  {% block content %}{% endblock %}
-</div>
+  <!-- loading overlay (hidden by default) -->
+  <div id="loading-overlay" class="loading-overlay d-none">
+    <div class="spinner-border text-light" role="status"
+         style="width:3rem; height:3rem;"></div>
+  </div>
+
+  <!---- simple dark navbar –-->
+  <nav class="navbar navbar-dark bg-dark px-3 mb-4">
+    <a class="navbar-brand brand-gradient" href="/">Content Buddy</a>
+
+    {% if user.is_authenticated %}
+      <span class="me-2 text-white">
+        Hi, {{ user.first_name|default:user.username }}
+      </span>
+      <a class="btn btn-sm btn-outline-light"
+         href="{% url 'account_logout' %}">Logout</a>
+    {% else %}
+      <a class="btn btn-sm btn-gradient"
+         href="{% url 'account_login' %}">Login with Google</a>
+    {% endif %}
+  </nav>
+
+  <div class="container py-5">
+    {% block content %}{% endblock %}
+  </div>
+
 </body>
+
 </html>

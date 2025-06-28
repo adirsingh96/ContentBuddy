@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import UrlForm
-from .utils import fetch_transcript, _extract_video_id,suggest_reels
+from .utils import fetch_transcript, _extract_video_id,suggest_reels,suggest_reels_full
 from django.contrib import messages
 
 def home(request):
@@ -16,7 +16,7 @@ def home(request):
             transcript = fetch_transcript(url)
 
             try:
-                reels = suggest_reels(transcript)
+                reels = suggest_reels_full(transcript)
             except Exception as e:
                 messages.error(request, f"Reel generation failed: {e}")
     else:

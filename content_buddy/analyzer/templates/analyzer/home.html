@@ -63,4 +63,12 @@
 </script>
 {% endif %}
 
+<!-- script #2 – show loading spinner while the form submits -->
+<script>
+  document.querySelector("form").addEventListener("submit", () => {
+      document.getElementById("loading-overlay")
+              .classList.remove("d-none");
+  });
+</script>
+
 {% endblock %}
