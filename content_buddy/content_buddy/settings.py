@@ -48,7 +48,8 @@ SECRET_KEY = "django-insecure-on$-2%1hb$af*vuksz_2itwuc)%h#sg3!26_mle)*u!f4%=0&l
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-    "content-buddy-nqfgn.ondigitalocean.app",   # exact service URL
+    "contrent-buddy-nqfgn.ondigitalocean.app",   # exact service URL
+
     ".ondigitalocean.app",                      # any preview envs
     "localhost", "127.0.0.1"                   # keep local dev
 ]
@@ -158,7 +159,7 @@ USE_I18N = True
 USE_TZ = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://content-buddy-nqfgn.ondigitalocean.app",
+    "https://contrent-buddy-nqfgn.ondigitalocean.app",
 ]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_SECURE = True
