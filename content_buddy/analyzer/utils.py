@@ -2,6 +2,7 @@ import re, datetime
 from youtube_transcript_api import (
     YouTubeTranscriptApi, NoTranscriptFound, TranscriptsDisabled
 )
+from youtube_transcript_api.proxies import WebshareProxyConfig
 
 from urllib.parse import urlparse, parse_qs
 from youtube_transcript_api import (
@@ -117,6 +118,7 @@ def _sec_to_hhmmss(seconds: float) -> str:
     """0-pad to HH:MM:SS (YouTube style)."""
     return str(datetime.timedelta(seconds=int(seconds)))
 
+'''
 def fetch_transcript(url: str, langs=None):
     preferred = ['hi', 'en'] if langs is None else langs
     vid = _extract_video_id(url)
@@ -132,7 +134,31 @@ def fetch_transcript(url: str, langs=None):
         return [{"time": "", "text": "No transcript in requested languages."}]
     except TranscriptsDisabled:
         return [{"time": "", "text": "Transcripts are disabled for this video."}]
-    
+ '''
+
+def fetch_transcript(url: str, langs=None):
+    preferred = ['hi', 'en'] if langs is None else langs
+    vid = _extract_video_id(url)
+
+    if not vid or len(vid) != 11:
+        raise ValueError("Invalid YouTube URL")
+
+    # Set up Webshare proxy configuration
+    proxy_config = WebshareProxyConfig(
+        proxy_username=os.environ["WEBSHARE_USERNAME"],
+        proxy_password=os.environ["WEBSHARE_PASSWORD"],
+    )
+    ytt_api = YouTubeTranscriptApi(proxy_config=proxy_config)
+
+    try:
+        raw = ytt_api.get_transcript(vid, languages=preferred)
+        return [{"time": _sec_to_hhmmss(s["start"]), "text": s["text"]} for s in raw]
+
+    except NoTranscriptFound:
+        return [{"time": "", "text": "No transcript in requested languages."}]
+    except TranscriptsDisabled:
+        return [{"time": "", "text": "Transcripts are disabled for this video."}]
+
 def _format_for_prompt(segments, limit=30000):
     """
     Turns [{time:'0:00:01',text:'hi'}...] into a compact string.
