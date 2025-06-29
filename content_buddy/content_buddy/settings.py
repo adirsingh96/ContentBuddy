@@ -47,7 +47,11 @@ SECRET_KEY = "django-insecure-on$-2%1hb$af*vuksz_2itwuc)%h#sg3!26_mle)*u!f4%=0&l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "content-buddy-nqfgn.ondigitalocean.app",   # exact service URL
+    ".ondigitalocean.app",                      # any preview envs
+    "localhost", "127.0.0.1"                   # keep local dev
+]
 
 
 # Application definition
