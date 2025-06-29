@@ -15,6 +15,11 @@ from pathlib import Path
 import os, dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_URL = "static/"
+
+# DigitalOcean writes into /staticfiles inside the container
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 dotenv.load_dotenv(BASE_DIR / ".env")        # NEW
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") # optional: can be read elsewhere too
 GOOGLE_CLIENT_ID     = os.getenv("GOOGLE_CLIENT_ID")
@@ -40,7 +45,7 @@ SOCIALACCOUNT_PROVIDERS = {
 SECRET_KEY = "django-insecure-on$-2%1hb$af*vuksz_2itwuc)%h#sg3!26_mle)*u!f4%=0&l"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -73,6 +78,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"   # easy mode; change for production
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -82,6 +88,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Compression/etag
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = "content_buddy.urls"
 

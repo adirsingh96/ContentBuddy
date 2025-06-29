@@ -1,0 +1,1 @@
+web: gunicorn content_buddy.wsgi:application --log-file -
